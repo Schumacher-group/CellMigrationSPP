@@ -1,4 +1,4 @@
-% sweep parameters of SPP model and plot individual trajectories
+% plot individual trajectories generated from SPP model
 close all
 clear
 
@@ -19,7 +19,6 @@ numBetas = length(betaValues);
 bcs = {'noflux', 'noflux', 'free'};
 
 trajectoryFig = figure;
-% trajectoryFig.Color='none';
 exportOptions = struct('Format','eps2',...
     'Color','rgb',...
     'Width',10,...
@@ -56,8 +55,6 @@ for permCtr = 1:3
             ax.YLabel.Position = ax.YLabel.Position.*[0 2 1];
             ax.ZLabel.String = 'z';
             ax.Box = 'on';
-%             ax.Title.String = ['\alpha = ' num2str(alpha,3) ', \beta = ' num2str(beta,3)];
-%             ax.Title.FontWeight = 'normal';
             % to illustrate confinement, make grey "walls", but leave free
             % boundaries empty (white)
             hold on

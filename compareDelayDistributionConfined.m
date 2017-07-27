@@ -1,4 +1,5 @@
-% sweep parameters of SPP model and plot distribution of peak delay times
+ % compare the distributions of peak delay times for different parameters
+ % under confinement
 close all
 clear
 
@@ -14,6 +15,7 @@ T = 1000;
 burnIn = 500;
 NValues = [100 25 9];
 LValues = [2 1 0.6];
+% for plotting results from the model with leaders uncomment below
 % NValues = [100 30 10];
 % LValues = [2 sqrt(3/10)*2 sqrt(1/10)*2];
 % Nlvalues = [10, 3, 1];
@@ -32,17 +34,19 @@ exportOptions = struct('Format','eps2',...
 
 precision = 2;
 %% load reference simulation results (no confinement)
-% reference = load('delayCorrResults_Nl10_selfAlign0.mat','alphaValues','betaValues','histPeakVar');
 reference = load('delayCorrResults.mat','alphaValues','betaValues','histPeakVar');
+% for plotting results from the model with leaders uncomment below
+% reference = load('delayCorrResults_Nl10_selfAlign0.mat','alphaValues','betaValues','histPeakVar');
 
 %% load results to compare with
 for permCtr = 1:3
     L = LValues(permCtr);
     N = NValues(permCtr);
+       results(permCtr) = load(['delayCorrResultsConfined_N' num2str(N) '_L' num2str(L,precision) '.mat'],...        
+'alphaValues','betaValues','histPeakVar');
+    % for plotting results from the model with leaders uncomment below
 %     Nl = Nlvalues(permCtr);
 %     results(permCtr) = load(['delayCorrResultsConfined_N' num2str(N) '_Nl' num2str(Nl) '_L' num2str(L,precision) '.mat'],...
-   results(permCtr) = load(['delayCorrResultsConfined_N' num2str(N) '_L' num2str(L,precision) '.mat'],...        
-'alphaValues','betaValues','histPeakVar');
 end
 %% plot distribution widths
 numPlots = 3*length(alphaValues)*length(betaValues);
@@ -67,10 +71,9 @@ end
 ax = gca;
 ax.Box = 'on';
 ax.XTick = 1:4;
-% ax.XTickLabel = {'free','N=100, L=2','N=30, L=1.1','N=10, L=0.63'};
-% ylim([0 22])
 ax.XTickLabel = {'free','N=100, L=2','N=25, L=1','N=9, L=0.6'};
-% ax.TickLabelInterpreter = 'tex';
+    % for plotting results from the model with leaders uncomment below
+% ax.XTickLabel = {'free','N=100, L=2','N=30, L=1.1','N=10, L=0.63'};
 ax.XLabel.String = 'confinement';
 ax.YLabel.String = 'heterogeneity \sigma(\tau_c)';
 legH.Title.String = '\beta';
@@ -79,6 +82,7 @@ legH.Title.String = '\beta';
 %% export figure
 set(gcf,'PaperUnits','centimeters')
 filename = ['manuscript/figures/delayVarConfinement'];
+    % for plotting results from the model with leaders uncomment below
 % filename = ['manuscript/figures/delayVarConfinementWithLeaders'];
 exportfig(gcf,[filename '.eps'],exportOptions);
 system(['epstopdf ' filename '.eps']);

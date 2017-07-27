@@ -14,12 +14,11 @@ repCtr = 1;
 precision = 2;
 filename = ['results/' 'T' num2str(T,precision) '_N' num2str(N,precision)...
     '_L' num2str(L,precision) ...
-    '_a' num2str(alpha,precision) '_b' num2str(beta,precision) ... %'_selfAlign' ...
-    '_run' num2str(repCtr) '.mat'];
+    '_a' num2str(alpha,precision) '_b' num2str(beta,precision) '_run' num2str(repCtr) '.mat'];
 out = load(filename);
 
-%% boundary detection as in getBoundaryPoints (here repeated because more
-% output is needed)
+%% boundary detection as in getBoundaryPoints 
+% (here repeated because more output is needed)
 maxDist = r0;
 points = out.cells(:,:,tPlot);
 dt = delaunayTriangulation(points);

@@ -30,7 +30,6 @@ set(gca,'xtick',[0,rc,re,ra,r0],'xticklabel',{num2str(0);'r_c';'r_e';'r_a';'r_0'
 xlim([0 r0])
 ylabel('force (arbitraty units)')
 xlabel('distance (between cells)')
-% legend('GCT','SMB','Location','NorthWest')
 box off
 
 %% export figure

@@ -1,4 +1,4 @@
-% sweep parameters of SPP model and plot distribution of peak delay times
+% plot distribution of peak delay times
 close all
 clear
 
@@ -39,10 +39,7 @@ precision = 2;
 %% load results
 binCentres = (min(lagValues)+2*binWidth):binWidth:(max(lagValues)-2*binWidth);
 histPeakLag = NaN(numAlphas,numBetas,numRepeats,(nLagValues - 1)/binWidth - 1);
-histPeakMeanAbs = NaN(numAlphas,numBetas,numRepeats);
 histPeakVar = NaN(numAlphas,numBetas,numRepeats);
-histPeakKurt = NaN(numAlphas,numBetas,numRepeats);
-histPeakKurt0 = NaN(numAlphas,numBetas,numRepeats);
 for alphaCtr = 1:numAlphas
     alpha = alphaValues(alphaCtr);
     for betaCtr = 1:numBetas
@@ -56,7 +53,7 @@ for alphaCtr = 1:numAlphas
             % load results
             filename = ['results/' 'T' num2str(T,precision) '_N' num2str(N,precision)...
                 '_L' num2str(L,precision) ...
-                '_a' num2str(alpha,precision) '_b' num2str(beta,precision) ... %'_selfAlign' ...
+                '_a' num2str(alpha,precision) '_b' num2str(beta,precision) ...
                 '_run' num2str(repCtr) '.mat'];
             out = load(filename);
             % discard burn-in
@@ -113,10 +110,7 @@ for alphaCtr = 1:numAlphas
                     histPeakLag(alphaCtr,betaCtr,repCtr,:) = histcounts(peakLags(threshPeaks),...
                         'BinWidth',binWidth,'BinLimits',[min(lagValues)+binWidth/2 max(lagValues)-binWidth/2],...
                         'Normalization','probability');
-                    histPeakMeanAbs(alphaCtr,betaCtr,repCtr) = mean(abs(peakLags(threshPeaks)));
                     histPeakVar(alphaCtr,betaCtr,repCtr) = var(peakLags(threshPeaks));
-                    histPeakKurt(alphaCtr,betaCtr,repCtr) = kurtosis(peakLags(threshPeaks),1);
-                    histPeakKurt0(alphaCtr,betaCtr,repCtr) = kurtosis(peakLags(threshPeaks),0);
                 end
             end
         end
@@ -137,9 +131,7 @@ for alphaCtr = 1:numAlphas
             %% export figure
             filename = ['manuscript/figures/diagnostics/delayDist_T' num2str(T) '_N' num2str(N) ...
                 '_L' num2str(L) '_a' num2str(alpha,precision) ...
-                '_b' num2str(beta,precision) ... %'_selfAlign'
-                ];
-            %export_fig([filename '.pdf'],'-depsc')
+                '_b' num2str(beta,precision)];
             set(distributionFig,'PaperUnits','centimeters')
             exportfig(distributionFig,[filename '.eps'],exportOptions);
             system(['epstopdf ' filename '.eps']);
@@ -148,38 +140,10 @@ for alphaCtr = 1:numAlphas
         close(distributionFig)
     end
 end
-%% plot multi-line diagram of variance and kurtosis
+%% plot multi-line diagram of variance
 exportOptions.FontSize = 14;
 exportOptions.Width = '15';
 legendString = num2str(round(alphaValues(1:2:end))');
-absFig = figure;
-boundedline(betaValues,nanmean(histPeakMeanAbs(1:2:end,:,:),3),...
-    permute(nanstd(histPeakMeanAbs(1:2:end,:,:),0,3)./...
-    sqrt(sum(~isnan(histPeakMeanAbs(1:2:end,:,:)),3)),[3 2 1]),'alpha','.-','nan','gap')
-ax1 = gca;
-ax1.XScale = 'log';
-ax1.XLabel.String = '\beta'; ax1.YLabel.String = '\langle|\tau_C|\rangle';
-absFig.Color='none'; ax1.Box = 'on';
-xlim([1 max(betaValues)])
-ylim([0 max(max(max(histPeakMeanAbs)))])
-% make an inset of non-log scale
-inset = axes('position',[0.25 0.5 0.4 0.4]);
-boundedline(betaValues,nanmean(histPeakMeanAbs(1:2:end,:,:),3),...
-    permute(nanstd(histPeakMeanAbs(1:2:end,:,:),0,3)./...
-    sqrt(sum(~isnan(histPeakMeanAbs(1:2:end,:,:)),3)),[3 2 1]),'alpha','.-','nan','gap')
-inset.XLim = [1 max(betaValues)];
-inset.YLim = [0 max(max(histPeakMeanAbs(1:2:end,end,:,:)))];
-inset.Box = 'on';
-legH = legend(ax1,legendString,'Location','NorthEast');
-legH.Title.String = '\alpha';
-% save figure
-filename = ['manuscript/figures/meanabsDelayDiagram_T' num2str(T) '_N' num2str(N) ...
-    '_L' num2str(L) ... %'_selfAlign'...
-    ];
-set(absFig,'PaperUnits','centimeters')
-exportfig(absFig,[filename '.eps'],exportOptions);
-system(['epstopdf ' filename '.eps']);
-    system(['rm ' filename '.eps']);
 
 sigmaFig = figure;
 boundedline(betaValues,nanmean(sqrt(histPeakVar(1:2:end,:,:)),3),...
@@ -188,14 +152,12 @@ boundedline(betaValues,nanmean(sqrt(histPeakVar(1:2:end,:,:)),3),...
 ax1 = gca;
 ax1.XScale = 'log';
 ax1.XLabel.String = 'attraction-repulsion strength \beta'; ax1.YLabel.String = 'heterogeneity \sigma(\tau_C)';
-absFig.Color='none'; ax1.Box = 'on';
+sigmaFig.Color='none'; ax1.Box = 'on';
 xlim([1 max(betaValues)])
 ylim([0 1+ceil(max(max(max(sqrt(histPeakVar(1:2:end,:,:))))))])
 % make an inset of non-log scale
 inset = axes('position',...
-    [0.33 0.59 0.4 0.335]...
-    ...%[0.43 0.1275 0.385 0.265] % selfalign
-);
+    [0.33 0.59 0.4 0.335]);
 boundedline(betaValues,nanmean(sqrt(histPeakVar(1:2:end,:,:)),3),...
     permute(nanstd(sqrt(histPeakVar(1:2:end,:,:)),0,3)./...
     sqrt(sum(~isnan(histPeakVar(1:2:end,:,:)),3)),[3 2 1]),'alpha','.-','nan','gap')
@@ -203,101 +165,13 @@ inset.XLim = [1 max(betaValues)];
 inset.YLim = [4 12.5];
 inset.YTick = [4 8 12];
 inset.Box = 'on';
-%inset.XAxisLocation = 'top'; %selfalign
-% legH = legend(ax1,legendString,'Location','SouthEast');
-% legH.Title.String = '\alpha';
-% legH.Position = [0.7325 0.17 0.1 0.199]...%[0.805 0.185 0.12 0.199] %selfalign
-% ;
 % save figure
 filename = ['manuscript/figures/varianceDelayDiagram_T' num2str(T) '_N' num2str(N) ...
-    '_L' num2str(L) ... %'_selfAlign'...
-    ];
+    '_L' num2str(L)];
 set(sigmaFig,'PaperUnits','centimeters')
 exportfig(sigmaFig,[filename '.eps'],exportOptions);
 system(['epstopdf ' filename '.eps']);
 system(['rm ' filename '.eps']);
 
-kurtFig = figure;
-boundedline(betaValues,nanmean(histPeakKurt(1:2:end,:,:),3),...
-    permute(nanstd(histPeakKurt(1:2:end,:,:),0,3)./...
-    sqrt(sum(~isnan(histPeakKurt(1:2:end,:,:)),3)),[3 2 1]),'alpha','.-','nan','gap')
-ax1 = gca;
-ax1.XScale = 'log';
-ax1.XLabel.String = '\beta'; ax1.YLabel.String = 'Kurt(\tau_C)';
-absFig.Color='none'; ax1.Box = 'on';
-xlim([1 max(betaValues)])
-ylim([0 max(max(max(histPeakKurt(1:2:end,:,:))))])
-% make an inset of non-log scale
-inset = axes('position',[0.25 0.5 0.4 0.4]);
-boundedline(betaValues,nanmean(histPeakKurt(1:2:end,:,:),3),...
-    permute(nanstd(histPeakKurt(1:2:end,:,:),0,3)./...
-    sqrt(sum(~isnan(histPeakKurt(1:2:end,:,:)),3)),[3 2 1]),'alpha','.-','nan','gap')
-inset.XLim = [1 max(betaValues)];
-inset.YLim = [0 max(max(histPeakKurt(1:2:end,end,:,:)))];
-inset.Box = 'on';
-legH = legend(ax1,legendString,'Location','NorthEast');
-legH.Title.String = '\alpha';
-% save figure
-filename = ['manuscript/figures/kurtosisDelayDiagram_T' num2str(T) '_N' num2str(N) ...
-    '_L' num2str(L) ... %'_selfAlign'...
-    ];
-set(kurtFig,'PaperUnits','centimeters')
-exportfig(kurtFig,[filename '.eps'],exportOptions);
-system(['epstopdf ' filename '.eps']);
-system(['rm ' filename '.eps']);
-
-kurt0Fig = figure;
-boundedline(betaValues,nanmean(histPeakKurt0(1:2:end,:,:),3),...
-    permute(nanstd(histPeakKurt0(1:2:end,:,:),0,3)./...
-    sqrt(sum(~isnan(histPeakKurt0(1:2:end,:,:)),3)),[3 2 1]),'alpha','.-','nan','gap')
-ax1 = gca;
-ax1.XScale = 'log';
-ax1.XLabel.String = '\beta'; ax1.YLabel.String = 'Kurt_0(\tau_C)';
-absFig.Color='none'; ax1.Box = 'on';
-xlim([1 max(betaValues)])
-ylim([0 max(max(max(histPeakKurt0(1:2:end,:,:))))])
-% make an inset of non-log scale
-inset = axes('position',[0.25 0.5 0.4 0.4]);
-boundedline(betaValues,nanmean(histPeakKurt0(1:2:end,:,:),3),...
-    permute(nanstd(histPeakKurt0(1:2:end,:,:),0,3)./...
-    sqrt(sum(~isnan(histPeakKurt0(1:2:end,:,:)),3)),[3 2 1]),'alpha','.-','nan','gap')
-inset.XLim = [1 max(betaValues)];
-inset.YLim = [0 max(max(histPeakKurt0(1:2:end,end,:,:)))];
-inset.Box = 'on';
-legH = legend(ax1,legendString,'Location','NorthEast');
-legH.Title.String = '\alpha';
-% save figure
-filename = ['manuscript/figures/kurtosisDebiasedDelayDiagram_T' num2str(T) '_N' num2str(N) ...
-    '_L' num2str(L) ... %'_selfAlign'...
-    ];
-set(kurt0Fig,'PaperUnits','centimeters')
-exportfig(kurt0Fig,[filename '.eps'],exportOptions);
-system(['epstopdf ' filename '.eps']);
-system(['rm ' filename '.eps']);
-%% surface plot
-figure
-surface(betaValues,alphaValues,mean(sqrt(histPeakVar),3),...
-    'FaceColor','interp','EdgeColor','none')
-xlabel('\beta'),ylabel('\alpha')
-set(gca,'xscale','log','yscale','log')
-xlim([1 128]),ylim([4 128])
-maxSig = round(max(max(mean(sqrt(histPeakVar),3))));
-colormap(flipud(gray(length(0:0.5:maxSig) - 1)))
-cb = colorbar;
-cb.Label.String = '\sigma(\tau_c)';
-cb.Label.Rotation = 0;
-cb.Label.HorizontalAlignment = 'left';
-caxis([0 maxSig])
-box on
-% save figure
-filename = ['manuscript/figures/varianceDelayDiagramSurface_T' num2str(T) '_N' num2str(N) ...
-    '_L' num2str(L) ... %'_selfAlign'...
-    ];
-set(gcf,'PaperUnits','centimeters')
-exportfig(gcf,[filename '.eps'],exportOptions);
-system(['epstopdf ' filename '.eps']);
-system(['rm ' filename '.eps']);
 %%
-save(['delayCorrResults' ... %'_selfAlign'
-    '.mat'],'alphaValues','betaValues','histPeakMeanAbs',...
-    'histPeakVar','histPeakKurt0','histPeakKurt')
+save('delayCorrResults.mat','alphaValues','betaValues','histPeakVar')

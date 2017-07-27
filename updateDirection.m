@@ -4,12 +4,8 @@ function arrayOut = updateDirection(arrayNow,arrayPrev,L,alpha,beta,...
 % forces
 
 % issues/to-do's:
-% - what to use for alignment radius? re? ra? ri?
-% - does it matter if we have discontinuities in our force laws curves?
-% - could also implement collisions as stopping or random direction
 % - periodic boundaries are only implemented for L>2*r0
 % - mixed periodic boundary conditions can be quite slow
-% - scale Fa by v0 or not?
 
 % short-hand for indexing coordinates
 x =     1;

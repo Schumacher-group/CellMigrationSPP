@@ -1,4 +1,4 @@
-% sweep parameters of SPP model and plot individual trajectories
+% plot individual trajectories generated from SPP model
 close all
 clear
 
@@ -37,8 +37,7 @@ for alphaCtr = 1:numAlphas
         % load results
         filename = ['results/' 'T' num2str(T,precision) '_N' num2str(N,precision)...
             '_L' num2str(L,precision) '_a' num2str(alpha,precision) ...
-            '_b' num2str(beta,precision) ...%'_selfAlign'...
-            '_run1.mat'];
+            '_b' num2str(beta,precision) '_run1.mat'];
         load(filename)
         % plot trajectories
         plot3(squeeze(cells(:,1,Trange))',squeeze(cells(:,2,Trange))',...
@@ -51,8 +50,7 @@ for alphaCtr = 1:numAlphas
         ax.YLabel.String = 'y';
         ax.YLabel.Position = ax.YLabel.Position.*[1.1 0.9 1];
         ax.ZLabel.String = 'z';
-        %         ax.Title.String = ['\alpha = ' num2str(alpha,3) ', \beta = ' num2str(beta,3)];
-        %         ax.Title.FontWeight = 'normal';
+
         % plot a scale bar
         hold on
         plot3([-0.5 0] + ax.XLim(2),min(ax.YLim)*[1 1],ax.ZLim(1)*[1 1],'k-','LineWidth',3)
@@ -60,8 +58,7 @@ for alphaCtr = 1:numAlphas
         ax.Box = 'on';
         %% export figure
         filename = ['manuscript/figures/trajectories_T' num2str(T) '_N' num2str(N) ...
-            '_L' num2str(L) '_a' num2str(alpha,precision) ...%'_selfAlign' ...
-            '_b' num2str(beta,precision)];
+            '_L' num2str(L) '_a' num2str(alpha,precision) '_b' num2str(beta,precision)];
         set(trajectoryFig,'PaperUnits','centimeters')
         exportfig(trajectoryFig,[filename '.eps'],exportOptions);
         system(['epstopdf ' filename '.eps']);

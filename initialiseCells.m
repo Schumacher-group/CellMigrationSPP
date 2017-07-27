@@ -4,7 +4,6 @@ function [outArray] = initialiseCells(inArray,L)
 
 % issues/to-do's:
 % - initial positions do not currently respect volume exclusion
-% - could implement non-random initial positions, e.g. regularly spaced
 
 % short-hand for indexing coordinates
 x =     1;

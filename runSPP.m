@@ -12,7 +12,7 @@
 % alpha: relative weight of alignment interaction
 % beta: relative weight of intercellular forces
 %
-% optional inputs, mostly as in Gregoire et al. Physica D (2003)
+% optional inputs, with default values, partly as in Gregoire et al. Physica D (2003)
 % v0: speed (default 0.05)
 % r0: interaction radius (default 1.0), should be >ra,re,rc
 % ra: attraction radius (default 0.8)

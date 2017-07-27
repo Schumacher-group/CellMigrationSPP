@@ -1,4 +1,5 @@
-% sweep parameters of SPP model and plot distribution of peak delay times
+% plot distribution of peak delay times for parts of cell population at the
+% boundary and centre
 close all
 clear
 
@@ -7,8 +8,8 @@ x =     1;
 y =     2;
 z =     3;
 
-alphaValues = 4%2.^(2:1:7);
-betaValues = 4%2.^(0:1:7);
+alphaValues = 4;
+betaValues = 4;
 numRepeats = 10;
 T = 1000;
 burnIn = 500;
@@ -54,7 +55,7 @@ for alphaCtr = 1:numAlphas
             % load results
             filename = ['results/' 'T' num2str(T,precision) '_N' num2str(N,precision)...
                 '_L' num2str(L,precision) ...
-                '_a' num2str(alpha,precision) '_b' num2str(beta,precision) ... %'_selfAlign' ...
+                '_a' num2str(alpha,precision) '_b' num2str(beta,precision) ...
                 '_run' num2str(repCtr) '.mat'];
             out = load(filename);
             % discard burn-in
@@ -138,7 +139,7 @@ for alphaCtr = 1:numAlphas
                 nanstd(histPeakLagCore(:,2:end-1));...
                 nanstd(histPeakLagBoundary(:,2:end-1))],1,1,2),[2 3 1]),... % stdev
                 'alpha','.-','cmap',[0.5*[1 1 1]; 0.7 0 1; 1 0.7 0]);
-            % plotting multiple bounded lines in one go works better with
+            % plotting multiple bounded lines in one go works better
             legend('mixed','core','boundary')
             % format figure
             ax = gca;
@@ -154,8 +155,7 @@ for alphaCtr = 1:numAlphas
             %% export figure
             filename = ['manuscript/figures/diagnostics/delayDistBoundary_T' num2str(T) '_N' num2str(N) ...
                 '_L' num2str(L) '_a' num2str(alpha,precision) ...
-                '_b' num2str(beta,precision) ... %'_selfAlign'
-                ];
+                '_b' num2str(beta,precision)];
             %export_fig([filename '.pdf'],'-depsc')
             set(distributionFig,'PaperUnits','centimeters')
             exportfig(distributionFig,[filename '.eps'],exportOptions);

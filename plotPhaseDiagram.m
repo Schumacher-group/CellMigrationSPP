@@ -1,4 +1,4 @@
-% sweep parameters of SPP model to calculate order phase diagrams
+% calculate and plot order phase diagrams
 close all
 clear
 
@@ -29,8 +29,7 @@ for repCtr = 1:numRepeats
             % load results
             filename = ['results/' 'T' num2str(T,precision) '_N' num2str(N,precision)...
                 '_L' num2str(L,precision) '_a' num2str(alpha,precision) ...
-                '_b' num2str(beta,precision) ... %'_selfAlign'...
-                '_run' num2str(repCtr) '.mat'];
+                '_b' num2str(beta,precision) '_run' num2str(repCtr) '.mat'];
             load(filename)
             % calculate order
             order(alphaCtr,betaCtr,repCtr) = mean(orderParameter(cells(:,:,burnIn:end)));
@@ -39,10 +38,7 @@ for repCtr = 1:numRepeats
     end
 end
 
-%% plot phase diagram - better plot as contours, image, or set of lines?
-% plotcolors = cool(length(betaValues));
-% figure, hold on, for ii=1:length(betaValues), plot(alphaValues,mean(order(:,ii,:),3),'Color',plotcolors(ii,:)), end
-% set(gca,'XScale','log')
+%% plot phase diagram 
 orderFig = figure;
 nContours = 10;
 contourf(betaValues,alphaValues,mean(order,3),nContours,'LineColor','none')
@@ -80,8 +76,7 @@ exportOptions = struct('Format','eps2',...
     'LineWidth',2,...
     'Renderer','opengl');
 filename = ['manuscript/figures/orderDiagram_T' num2str(T) '_N' num2str(N) ...
-    '_L' num2str(L) ... %'_selfAlign'...
-    ];
+    '_L' num2str(L)];
 set(orderFig,'PaperUnits','centimeters')
 exportfig(orderFig,[filename '.eps'],exportOptions);
 system(['epstopdf ' filename '.eps']);

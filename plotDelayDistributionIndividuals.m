@@ -1,5 +1,4 @@
-% sweep parameters of SPP model and plot distribution of peak delay times
-% for individual cells
+% plot distribution of peak delay times for individual cells
 close all
 clear
 
@@ -8,8 +7,8 @@ x =     1;
 y =     2;
 z =     3;
 
-alphaValues = 16%2.^(2:1:7);
-betaValues = 32%2.^(1:1:7);
+alphaValues = 16;
+betaValues = 32;
 numRepeats = 10;
 T = 1000;
 burnIn = 500;
@@ -23,7 +22,7 @@ binWidth = 1;
 smoothWidth = 3;
 maxLag = 20;
 lagValues = -24:24; % should allow for an integer number of bins
-% use two more bins than wanted (one fpr nicer plotting, one to discard edges)
+% use two more bins than wanted (one for nicer plotting, one to discard edges)
 nLagValues = length(lagValues);
 minCorr = 0.5;
 minOrder = 0.1; % as computing correlations for all pairs and delays is expensive, only do for relatively ordered collectives
@@ -52,7 +51,7 @@ for alphaCtr = 1:numAlphas
             % load results
             filename = ['results/' 'T' num2str(T,precision) '_N' num2str(N,precision)...
                 '_L' num2str(L,precision) ...
-                '_a' num2str(alpha,precision) '_b' num2str(beta,precision) ... %'_selfAlign' ...
+                '_a' num2str(alpha,precision) '_b' num2str(beta,precision) ...
                 '_run' num2str(repCtr) '.mat'];
             out = load(filename);
             % discard burn-in
@@ -70,12 +69,8 @@ for alphaCtr = 1:numAlphas
                 
                 % only keep cross-correlations if cells have been neighbours (within r0)
                 pairDistances = NaN(N*(N-1)/2,T-burnIn);
-                % %                 boundaryMtx = false(N,T-burnIn);
                 for timeCtr=1:T-burnIn % can be parfor-ed
                     pairDistances(:,timeCtr) = pdist(out.cells(:,1:3,timeCtr));
-                    % %                     % check which cells are at the boundary
-                    % %                     [~, boundaryPointIDs] = getBoundaryPoints(out.cells(:,1:3,timeCtr),r0);
-                    % %                     boundaryMtx(boundaryPointIDs,timeCtr) = true;
                 end
                 notNeighbours = min(pairDistances,[],2)>r0;
                 dirCrossCorr(notNeighbours,:) = NaN;
@@ -141,12 +136,10 @@ for alphaCtr = 1:numAlphas
                         ax.Box = 'on';
                         ax.XLim = [-maxLag maxLag];
                         ax.XTick = [-maxLag:5:maxLag];
-%                         ax.XTickLabel{2} = '\tau_C';
                         ax.XLabel.String = 'peak delay time \tau_C';
                         ax.YLim = [0 ceil(max(max(delayDist(:,2:end-1)))*10)/10];
                         ax.YTick = linspace(0,ax.YLim(2),3);
                         ax.YTickLabel = num2str(ax.YTick','%1.1f');
-%                         ax.YTickLabel{2} = 'P';
                         ax.YLabel.String = 'probability P';
                         ax.Title.String = ['individual distributions, \alpha = ' num2str(alpha,3) ', \beta = ' num2str(beta,3)];
                         ax.Title.FontWeight = 'normal';
@@ -158,9 +151,7 @@ for alphaCtr = 1:numAlphas
         %% export figure
         filename = ['manuscript/figures/diagnostics/delayDistIndividuals_T' num2str(T) '_N' num2str(N) ...
             '_L' num2str(L) '_a' num2str(alpha,precision) ...
-            '_b' num2str(beta,precision) ... %'_selfAlign'
-            ];
-        %export_fig([filename '.pdf'],'-depsc')
+            '_b' num2str(beta,precision) ];
         set(distributionFig,'PaperUnits','centimeters')
         exportfig(distributionFig,[filename '.eps'],exportOptions);
         system(['epstopdf ' filename '.eps']);
